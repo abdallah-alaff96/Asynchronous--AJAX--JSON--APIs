@@ -1,2 +1,2 @@
 # Asynchronous-AJAX-JSON-API
- deep learning of Asynchronous, AJAX, JSONM, APIs
+ deep learning of Asynchronous, AJAX, JSON, APIs
