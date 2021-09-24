@@ -11,7 +11,8 @@ const countriesContainer = document.querySelector('.countries');
 // 1- The most old school of AJAX is : XML HTTP request function
 const getCountryDate = function (country) {
   const request = new XMLHttpRequest();
-  request.open('GET', `https://restcountries.eu/rest/v2/name/${country}`);
+  // request.open('GET', `https://restcountries.eu/rest/v2/name/${country}`);
+  request.open('GET', `https://restcountries.com/v2/name/${country}`);
   request.send();
   request.addEventListener('load', function () {
     const [data] = JSON.parse(this.responseText); // destructuing, because its an object inside an array
@@ -20,7 +21,7 @@ const getCountryDate = function (country) {
     //   create a templet leteral :
     const html = `
      <article class="country">
-          <img class="country__img" src="${data.flag}" />
+          <img class="country__img" src="${data.flags[1]}" />
           <div class="country__data">
             <h3 class="country__name">${data.name}</h3>
             <h4 class="country__region">${data.region}</h4>
@@ -40,7 +41,7 @@ const getCountryDate = function (country) {
   });
 };
 
-// Note that the order of the following function calls will not be in that order due to 'load' event, the first one will appear at first then the second and so on...
+// Note that the order of the following function calls will not be in that order due to 'load' event, the first one will appear at first then the second and so on... (paraller apperance)
 // to solve this issue, we have to "chain the requests" (will be taken next lecture)
 getCountryDate('portugal');
 getCountryDate('spain');
@@ -48,3 +49,5 @@ getCountryDate('egypt');
 getCountryDate('turkey');
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//246. Welcome to CallBack Hell
+// in this lecutre it runs in (sequence) not in paraller as previous ex
