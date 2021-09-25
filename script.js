@@ -60,7 +60,7 @@ const countriesContainer = document.querySelector('.countries');
 const renderCountry = function (data, className = '') {
   const html = `
   <article class="country ${className}">
-          <img class="country__img" src="${data.flags[1]}" />
+          <img class="country__img" src="${data.flags[0]}" />
           <div class="country__data">
           <h3 class="country__name">${data.name}</h3>
             <h4 class="country__region">${data.region}</h4>
@@ -113,11 +113,29 @@ const renderCountry = function (data, className = '') {
 // 248. Consuming Promises
 
 // the modren way of XMLHTTPRequest()
-// .then means: do the next order to this promise.      .this comes with promises only
+// // .then means: do the next order to this promise.      .this comes with promises only
+// const getCountrydata = function (country) {
+//   fetch(`https://restcountries.com/v2/name/${country}`)
+//     .then(response => response.json()) // json() was written as a method of response to converts the pending status into handled formation
+//     .then(data => renderCountry(data[0])); // .then used because "response.json()" will return a promise and to handle it we need ".then"
+//   // these previous two "thens" are small chain
+// };
+// getCountrydata('portugal');
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 249. Chanining Promises - The Best Practice
+
 const getCountrydata = function (country) {
   fetch(`https://restcountries.com/v2/name/${country}`)
-    .then(response => response.json()) // json() was written as a method of response to converts the pending status into handled formation
-    .then(data => renderCountry(data[0])); // .then used because "response.json()" will return a promise and to handle it we need ".then"
+    .then(response => response.json())
+    .then(data => {
+      renderCountry(data[0]);
+      const neighbour = data[0].borders[0];
+      // return the fetch output (promise) and write .then .then outside to avoid calling a callback fucntion inside a callback function (to avoid callback Hell)
+      return fetch(`https://restcountries.com/v2/alpha/${neighbour}`);
+    })
+    .then(response => response.json())
+    .then(data => renderCountry(data, 'neighbour'));
 };
 
 getCountrydata('portugal');
