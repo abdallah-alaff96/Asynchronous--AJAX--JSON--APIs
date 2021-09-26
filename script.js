@@ -90,16 +90,16 @@ const renderCountry = function (data, className = '') {
 
 //     // Render Country 1
 //     renderCountry(data);
-//     const [neighbour] = data.borders;
-//     console.log(neighbour);
-//     // Get neighbour Country 2
+//     const [neighbor] = data.borders;
+//     console.log(neighbor);
+//     // Get neighbor Country 2
 //     const request2 = new XMLHttpRequest();
-//     request2.open('GET', `https://restcountries.com/v2/alpha/${neighbour}`);
+//     request2.open('GET', `https://restcountries.com/v2/alpha/${neighbor}`);
 //     request2.send();
 //     request2.addEventListener('load', function () {
 //       const data2 = JSON.parse(this.responseText);
 //       console.log(data2);
-//       renderCountry(data2, 'neighbour');
+//       renderCountry(data2, 'neighbor');
 //     });
 //   });
 // };
@@ -125,17 +125,39 @@ const renderCountry = function (data, className = '') {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 249. Chanining Promises - The Best Practice
 
+// for country >> neighbor
 const getCountrydata = function (country) {
   fetch(`https://restcountries.com/v2/name/${country}`)
     .then(response => response.json())
     .then(data => {
       renderCountry(data[0]);
-      const neighbour = data[0].borders[0];
+      const neighbor = data[0].borders[0];
       // return the fetch output (promise) and write .then .then outside to avoid calling a callback fucntion inside a callback function (to avoid callback Hell)
-      return fetch(`https://restcountries.com/v2/alpha/${neighbour}`);
+      return fetch(`https://restcountries.com/v2/alpha/${neighbor}`);
     })
     .then(response => response.json())
-    .then(data => renderCountry(data, 'neighbour'));
+    .then(data => renderCountry(data, 'neighbor'));
 };
 
 getCountrydata('portugal');
+
+// for country >> neighbor >> neighbor the neighbor
+// const getCountrydata = function (country) {
+//   fetch(`https://restcountries.com/v2/name/${country}`)
+//     .then(response => response.json())
+//     .then(data => {
+//       renderCountry(data[0]);
+//       const neighbor = data[0].borders[0];
+//       return fetch(`https://restcountries.com/v2/alpha/${neighbor}`);
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//       renderCountry(data, 'neighbor');
+//       const neighbor2 = data.borders[0];
+//       return fetch(`https://restcountries.com/v2/alpha/${neighbor2}`);
+//     })
+//     .then(responce => responce.json())
+//     .then(data => renderCountry(data, 'neighbor'));
+// };
+
+// getCountrydata('portugal');
