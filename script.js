@@ -210,10 +210,10 @@ const getJSON = function (url, errorMsg = 'Something went wrong') {
 const getCountrydata = function (country) {
   getJSON(`https://restcountries.com/v2/name/${country}`, 'Country not found')
     .then(data => {
-      console.log(data);
       renderCountry(data[0]);
       const neighbor = data[0].borders[0];
-      if (!neighbor) return;
+      // if no neighbor found >> throw an error telling that
+      if (!neighbor) throw new Error(`There is no neigbor!`);
       // country 2
       return getJSON(
         `https://restcountries.com/v2/alpha/${neighbor}`,
@@ -222,7 +222,6 @@ const getCountrydata = function (country) {
     })
     .then(data => renderCountry(data, 'neighbor'))
     .catch(err => {
-      console.error(err);
       renderError(`Something went wrong 💥💥💥 ${err.message}. Try again!`);
     })
     .finally(() => {
@@ -231,5 +230,5 @@ const getCountrydata = function (country) {
 };
 
 btn.addEventListener('click', function (e) {
-  getCountrydata('uas');
+  getCountrydata('australia');
 });
