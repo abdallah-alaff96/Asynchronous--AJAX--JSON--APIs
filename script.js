@@ -171,15 +171,55 @@ const renderCountry = function (data, className = '') {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 250. Handling Rejected Promises === error
 
+// const getCountrydata = function (country) {
+//   fetch(`https://restcountries.com/v2/name/${country}`)
+//     .then(response => response.json())
+//     .then(data => {
+//       renderCountry(data[0]);
+//       const neighbor = data[0].borders[0];
+//       if (!neighbor) return;
+//       // country 2
+//       return fetch(`https://restcountries.com/v2/alpha/${neighbor}`);
+//     })
+//     .then(response => response.json())
+//     .then(data => renderCountry(data, 'neighbor'))
+//     .catch(err => {
+//       console.error(err);
+//       renderError(`Something went wrong 💥💥💥 ${err.message}. Try again!`);
+//     })
+//     .finally(() => {
+//       countriesContainer.style.opacity = 1; // instead of loading spinner which used with asycn actions
+//     });
+// };
+
+// btn.addEventListener('click', function (e) {
+//   getCountrydata('uas');
+// });
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 251.Throwing Errors Manually  -  to fix "404" error
+
+const getJSON = function (url, errorMsg = 'Something went wrong') {
+  return fetch(url).then(response => {
+    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+
+    return response.json();
+  });
+};
+
 const getCountrydata = function (country) {
-  fetch(`https://restcountries.com/v2/name/${country}`)
-    .then(response => response.json())
+  getJSON(`https://restcountries.com/v2/name/${country}`, 'Country not found')
     .then(data => {
+      console.log(data);
       renderCountry(data[0]);
       const neighbor = data[0].borders[0];
-      return fetch(`https://restcountries.com/v2/alpha/${neighbor}`);
+      if (!neighbor) return;
+      // country 2
+      return getJSON(
+        `https://restcountries.com/v2/alpha/${neighbor}`,
+        'Country not found'
+      );
     })
-    .then(response => response.json())
     .then(data => renderCountry(data, 'neighbor'))
     .catch(err => {
       console.error(err);
@@ -191,5 +231,5 @@ const getCountrydata = function (country) {
 };
 
 btn.addEventListener('click', function (e) {
-  getCountrydata('portugal');
+  getCountrydata('uas');
 });
