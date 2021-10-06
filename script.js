@@ -236,28 +236,41 @@ const renderCountry = function (data, className = '') {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 252.Coding challange #1
 
-const whereAmI = function (lat, lng) {
-  fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
-    .then(response => {
-      if (!response.ok)
-        throw new Error(`you have an error: ${response.status}`);
-      return response.json();
-    })
-    .then(data => {
-      console.log(`You are in ${data.city}, ${data.country}`);
-      return fetch(`https://restcountries.com/v2/name/${data.country}`);
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('There is no Fucking country!!!');
-      return res.json();
-    })
-    .then(data => {
-      console.log(data[0]);
-      renderCountry(data[0]);
-    })
-    .catch(err => console.log(err));
-};
+// const whereAmI = function (lat, lng) {
+//   fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
+//     .then(response => {
+//       if (!response.ok)
+//         throw new Error(`you have an error: ${response.status}`);
+//       return response.json();
+//     })
+//     .then(data => {
+//       console.log(`You are in ${data.city}, ${data.country}`);
+//       return fetch(`https://restcountries.com/v2/name/${data.country}`);
+//     })
+//     .then(res => {
+//       if (!res.ok) throw new Error('There is no Fucking country!!!');
+//       return res.json();
+//     })
+//     .then(data => {
+//       console.log(data[0]);
+//       renderCountry(data[0]);
+//     })
+//     .catch(err => console.log(err));
+// };
 
-// whereAmI(52.508, 13.381);
-// whereAmI(19.037, 72.873);
-whereAmI(-33.933, 18.474);
+// // whereAmI(52.508, 13.381);
+// // whereAmI(19.037, 72.873);
+// whereAmI(-33.933, 18.474);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 255. The Event loop in practice
+
+// the simpliest Event loop example - immmp
+console.log('Start Test');
+setTimeout(() => console.log('0 sec timer'), 0);
+Promise.resolve('Resolved promise 1').then(res => console.log(res));
+Promise.resolve('Resolved promise 2').then(res => {
+  for (let i = 0; i < 1000000000; i++) {}
+  console.log(res);
+});
+console.log('End Test');
