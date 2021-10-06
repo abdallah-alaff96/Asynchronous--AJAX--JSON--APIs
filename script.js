@@ -289,7 +289,7 @@ const lotteryPromise = new Promise(function (resolve, reject) {
   }, 2000);
 });
 
-lotteryPromise.then(res => console.log(res)).catch(err => console.log(err));
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
 
 // Promisifying setTimeout : to convert setTimeout into async. function to make the page faster (improve performance - Optimization)
 const wait = function (seconds) {
@@ -298,9 +298,21 @@ const wait = function (seconds) {
   });
 };
 
-wait(2)
+wait(1)
+  .then(() => {
+    console.log('I have waited 1 sec');
+    return wait(1); //  to "chaining Promises" and avoid "callback Hell"
+  })
   .then(() => {
     console.log('I have waited 2 sec');
     return wait(1); //  to "chaining Promises" and avoid "callback Hell"
   })
-  .then(() => console.log('I ve waited 1 more sec !!!'));
+  .then(() => {
+    console.log('I have waited 3 sec');
+    return wait(1); //  to "chaining Promises" and avoid "callback Hell"
+  })
+  .then(() => console.log('I have waited 4 sec'));
+
+// immediate resolved/rejected promises
+Promise.resolve('abc').then(x => console.log(x));
+Promise.reject('Problem!!!').catch(err => console.error(err));
