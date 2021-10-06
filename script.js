@@ -266,11 +266,41 @@ const renderCountry = function (data, className = '') {
 // 255. The Event loop in practice
 
 // the simpliest Event loop example - immmp
-console.log('Start Test');
-setTimeout(() => console.log('0 sec timer'), 0);
-Promise.resolve('Resolved promise 1').then(res => console.log(res));
-Promise.resolve('Resolved promise 2').then(res => {
-  for (let i = 0; i < 1000000000; i++) {}
-  console.log(res);
+// console.log('Start Test');
+// setTimeout(() => console.log('0 sec timer'), 0);
+// Promise.resolve('Resolved promise 1').then(res => console.log(res));
+// Promise.resolve('Resolved promise 2').then(res => {
+//   for (let i = 0; i < 1000000000; i++) {}
+//   console.log(res);
+// });
+// console.log('End Test');
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 256. Building a simple promise
+
+const lotteryPromise = new Promise(function (resolve, reject) {
+  console.log('Lottery draw is happening...');
+  setTimeout(() => {
+    if (Math.random() >= 0.5) {
+      resolve('You Win 💰');
+    } else {
+      reject(new Error('You lost your money 💩'));
+    }
+  }, 2000);
 });
-console.log('End Test');
+
+lotteryPromise.then(res => console.log(res)).catch(err => console.log(err));
+
+// Promisifying setTimeout : to convert setTimeout into async. function to make the page faster (improve performance - Optimization)
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+wait(2)
+  .then(() => {
+    console.log('I have waited 2 sec');
+    return wait(1); //  to "chaining Promises" and avoid "callback Hell"
+  })
+  .then(() => console.log('I ve waited 1 more sec !!!'));
