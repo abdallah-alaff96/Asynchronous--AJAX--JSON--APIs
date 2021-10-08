@@ -278,41 +278,93 @@ const renderCountry = function (data, className = '') {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 256. Building a simple promise
 
-const lotteryPromise = new Promise(function (resolve, reject) {
-  console.log('Lottery draw is happening...');
-  setTimeout(() => {
-    if (Math.random() >= 0.5) {
-      resolve('You Win 💰');
-    } else {
-      reject(new Error('You lost your money 💩'));
-    }
-  }, 2000);
-});
+// const lotteryPromise = new Promise(function (resolve, reject) {
+//   console.log('Lottery draw is happening...');
+//   setTimeout(() => {
+//     if (Math.random() >= 0.5) {
+//       resolve('You Win 💰');
+//     } else {
+//       reject(new Error('You lost your money 💩'));
+//     }
+//   }, 2000);
+// });
 
-lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+// lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
 
-// Promisifying setTimeout : to convert setTimeout into async. function to make the page faster (improve performance - Optimization)
-const wait = function (seconds) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, seconds * 1000);
+// // Promisifying setTimeout : to convert setTimeout into async. function to make the page faster (improve performance - Optimization)
+// const wait = function (seconds) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
+
+// wait(1)
+//   .then(() => {
+//     console.log('I have waited 1 sec');
+//     return wait(1); //  to "chaining Promises" and avoid "callback Hell"
+//   })
+//   .then(() => {
+//     console.log('I have waited 2 sec');
+//     return wait(1); //  to "chaining Promises" and avoid "callback Hell"
+//   })
+//   .then(() => {
+//     console.log('I have waited 3 sec');
+//     return wait(1); //  to "chaining Promises" and avoid "callback Hell"
+//   })
+//   .then(() => console.log('I have waited 4 sec'));
+
+// // immediate resolved/rejected promises
+// Promise.resolve('abc').then(x => console.log(x));
+// Promise.reject('Problem!!!').catch(err => console.error(err));
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 257. Promisifying the Geolocation API
+
+// instead of using geolocation API like this (old way):
+// navigator.geolocation.getCurrentPosition(
+//   position => console.log(position),
+//   err => console.error(err)
+// );
+
+// After Promisifing :
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    // way 1
+    // navigator.geolocation.getCurrentPosition(
+    //   position => resolve(position),
+    //   err => reject(err)
+    // );
+
+    // way 2
+    navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
+// getPosition().then(pos => console.log(pos));
 
-wait(1)
-  .then(() => {
-    console.log('I have waited 1 sec');
-    return wait(1); //  to "chaining Promises" and avoid "callback Hell"
-  })
-  .then(() => {
-    console.log('I have waited 2 sec');
-    return wait(1); //  to "chaining Promises" and avoid "callback Hell"
-  })
-  .then(() => {
-    console.log('I have waited 3 sec');
-    return wait(1); //  to "chaining Promises" and avoid "callback Hell"
-  })
-  .then(() => console.log('I have waited 4 sec'));
+const whereAmI = function () {
+  getPosition()
+    .then(pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    })
+    .then(response => {
+      if (!response.ok)
+        throw new Error(`you have an error: ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      console.log(`You are in ${data.city}, ${data.country}`);
+      return fetch(`https://restcountries.com/v2/name/${data.country}`);
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('There is no Fucking country!!!');
+      return res.json();
+    })
+    .then(data => {
+      console.log(data[0]);
+      renderCountry(data[0]);
+    })
+    .catch(err => console.error(`${err.message} 💥`));
+};
 
-// immediate resolved/rejected promises
-Promise.resolve('abc').then(x => console.log(x));
-Promise.reject('Problem!!!').catch(err => console.error(err));
+btn.addEventListener('click', whereAmI);
