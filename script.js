@@ -2,6 +2,7 @@
 
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
+const imgContainer = document.querySelector('.images');
 
 // to handle pormise errors
 const renderError = function (msg) {
@@ -291,12 +292,12 @@ const renderCountry = function (data, className = '') {
 
 // lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
 
-// // Promisifying setTimeout : to convert setTimeout into async. function to make the page faster (improve performance - Optimization)
-// const wait = function (seconds) {
-//   return new Promise(function (resolve) {
-//     setTimeout(resolve, seconds * 1000);
-//   });
-// };
+// Promisifying setTimeout : to convert setTimeout into async. function to make the page faster (improve performance - Optimization)
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
 
 // wait(1)
 //   .then(() => {
@@ -327,44 +328,72 @@ const renderCountry = function (data, className = '') {
 // );
 
 // After Promisifing :
-const getPosition = function () {
-  return new Promise(function (resolve, reject) {
-    // way 1
-    // navigator.geolocation.getCurrentPosition(
-    //   position => resolve(position),
-    //   err => reject(err)
-    // );
+// const getPosition = function () {
+//   return new Promise(function (resolve, reject) {
+//     // way 1
+//     // navigator.geolocation.getCurrentPosition(
+//     //   position => resolve(position),
+//     //   err => reject(err)
+//     // );
 
-    // way 2
-    navigator.geolocation.getCurrentPosition(resolve, reject);
+//     // way 2
+//     navigator.geolocation.getCurrentPosition(resolve, reject);
+//   });
+// };
+// // getPosition().then(pos => console.log(pos));
+
+// const whereAmI = function () {
+//   getPosition()
+//     .then(pos => {
+//       const { latitude: lat, longitude: lng } = pos.coords;
+//       return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+//     })
+//     .then(response => {
+//       if (!response.ok)
+//         throw new Error(`you have an error: ${response.status}`);
+//       return response.json();
+//     })
+//     .then(data => {
+//       console.log(`You are in ${data.city}, ${data.country}`);
+//       return fetch(`https://restcountries.com/v2/name/${data.country}`);
+//     })
+//     .then(res => {
+//       if (!res.ok) throw new Error('There is no Fucking country!!!');
+//       return res.json();
+//     })
+//     .then(data => {
+//       console.log(data[0]);
+//       renderCountry(data[0]);
+//     })
+//     .catch(err => console.error(`${err.message} 💥`));
+// };
+
+// btn.addEventListener('click', whereAmI);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 258. coding challenge #2
+
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const img = document.createElement('img');
+    img.src = imgPath;
+    img.addEventListener('load', function () {
+      imgContainer.append(img);
+      resolve(img);
+    });
+    img.addEventListener('error', reject);
   });
 };
-// getPosition().then(pos => console.log(pos));
+let currentImg;
 
-const whereAmI = function () {
-  getPosition()
-    .then(pos => {
-      const { latitude: lat, longitude: lng } = pos.coords;
-      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-    })
-    .then(response => {
-      if (!response.ok)
-        throw new Error(`you have an error: ${response.status}`);
-      return response.json();
-    })
-    .then(data => {
-      console.log(`You are in ${data.city}, ${data.country}`);
-      return fetch(`https://restcountries.com/v2/name/${data.country}`);
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('There is no Fucking country!!!');
-      return res.json();
-    })
-    .then(data => {
-      console.log(data[0]);
-      renderCountry(data[0]);
-    })
-    .catch(err => console.error(`${err.message} 💥`));
-};
-
-btn.addEventListener('click', whereAmI);
+createImage('img/img-1.jpg')
+  .then(img => {
+    currentImg = img;
+    return wait(2);
+  })
+  .then(() => {
+    console.log(currentImg);
+    currentImg.style.display = 'none';
+    return createImage('img/img-2.jpg');
+  })
+  .catch(err => console.error(err));
