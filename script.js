@@ -436,6 +436,43 @@ const wait = function (seconds) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 260.Error Handling with try...catch
 
+// const getPosition = function () {
+//   return new Promise(function (resolve, reject) {
+//     navigator.geolocation.getCurrentPosition(resolve, reject);
+//   });
+// };
+
+// const whereAmI = async function () {
+//   try {
+//     // Geolocation
+//     const pos = await getPosition();
+//     const { latitude: lat, longitude: lng } = pos.coords;
+//     // Reverse Geocoding
+//     const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+//     if (!resGeo.ok) throw new Error('Problem getting location data');
+//     const dataGeo = resGeo.json();
+//     console.log(dataGeo);
+
+//     //Country Data
+//     const res = await fetch(
+//       `https://restcountries.com/v2/name/${dataGeo.country}`
+//     );
+//     if (!res.ok) throw new Error('Problem getting country');
+//     const data = await res.json();
+//     renderCountry(data);
+//   } catch (err) {
+//     console.error(`${err.message} 💥`);
+//     // or
+//     renderError(`${err.message}`);
+//   }
+// };
+
+// whereAmI();
+// console.log('First');
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 261.Returning values from Async Functions
+
 const getPosition = function () {
   return new Promise(function (resolve, reject) {
     navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -447,11 +484,11 @@ const whereAmI = async function () {
     // Geolocation
     const pos = await getPosition();
     const { latitude: lat, longitude: lng } = pos.coords;
+
     // Reverse Geocoding
     const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
     if (!resGeo.ok) throw new Error('Problem getting location data');
     const dataGeo = resGeo.json();
-    console.log(dataGeo);
 
     //Country Data
     const res = await fetch(
@@ -462,10 +499,31 @@ const whereAmI = async function () {
     renderCountry(data);
   } catch (err) {
     console.error(`${err.message} 💥`);
-    // or
-    renderError(`${err.message}`);
+    // Reject Promise returned from async function
+    // Rethrow Error
+    throw err;
   }
 };
+console.log('1: will get location');
 
-whereAmI();
-console.log('First');
+// solution 1 old way (using then().catch())
+{
+  // whereAmI()
+  //   .then(city => console.log(`2:${city}`))
+  //   .catch(err => console.error(`2: ${err.message} 💥💥 after rethrow error`))
+  //   .finally(() => console.log('3: Finished getting location'));
+  // //if I want '3: .....' to be excuted after "2: ........" so, using finally()
+  // console.log('3: Finished getting location');
+}
+
+// solution 2 - new way - using (Async/Await)
+// the next is an async X function (the same async function consept)
+(async function () {
+  try {
+    const city = await whereAmI();
+    console.log(`2:${city}`);
+  } catch (err) {
+    console.error(`2: ${err.message} 💥💥 after rethrow error`);
+  }
+  console.log('3: Finished getting location');
+})();
