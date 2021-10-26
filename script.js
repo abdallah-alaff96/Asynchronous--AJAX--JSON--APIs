@@ -371,29 +371,64 @@ const wait = function (seconds) {
 // btn.addEventListener('click', whereAmI);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 258. coding challenge #2
+// 258. coding challenge #2 - Promisifying
+// Promisifying the call back-function of addEventListener to load img
+// const createImage = function (imgPath) {
+//   return new Promise(function (resolve, reject) {
+//     const img = document.createElement('img');
+//     img.src = imgPath;
+//     img.addEventListener('load', function () {
+//       imgContainer.append(img);
+//       resolve(img);
+//     });
+//     img.addEventListener('error', reject);
+//   });
+// };
+// let currentImg;
 
-const createImage = function (imgPath) {
+// createImage('img/img-1.jpg')
+//   .then(img => {
+//     currentImg = img;
+//     return wait(2);
+//   })
+//   .then(() => {
+//     console.log(currentImg);
+//     currentImg.style.display = 'none';
+//     return createImage('img/img-2.jpg');
+//   })
+//   .catch(err => console.error(err));
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 259.Consuming Promises with Async / Await
+
+const getPosition = function () {
   return new Promise(function (resolve, reject) {
-    const img = document.createElement('img');
-    img.src = imgPath;
-    img.addEventListener('load', function () {
-      imgContainer.append(img);
-      resolve(img);
-    });
-    img.addEventListener('error', reject);
+    navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
-let currentImg;
 
-createImage('img/img-1.jpg')
-  .then(img => {
-    currentImg = img;
-    return wait(2);
-  })
-  .then(() => {
-    console.log(currentImg);
-    currentImg.style.display = 'none';
-    return createImage('img/img-2.jpg');
-  })
-  .catch(err => console.error(err));
+// its the same old way (using 'then')
+// fetch(`https://restcountries.com/v2/name/${country}`).then(res => {
+//   console.log(res);
+// });
+const whereAmI = async function () {
+  // Geolocation
+  const pos = await getPosition();
+  const { latitude: lat, longitude: lng } = pos.coords;
+  // Reverse Geocoding
+  const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+  const dataGeo = resGeo.json();
+  console.log(dataGeo);
+
+  const res = await fetch(
+    `https://restcountries.com/v2/name/${dataGeo.country}`
+  );
+  const data = await res.json();
+  // console.log(res);
+  // console.log(data);
+  // console.log(data[0]);
+  renderCountry(data);
+};
+
+whereAmI();
+console.log('First');
